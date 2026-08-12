@@ -25,7 +25,7 @@ export default function FooterForm() {
             <Label className="mb-3 block text-base font-semibold">Jumlah Jam Total</Label>
             {isPLP && (
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label>Pembelajaran</Label>
                   <Input
                     placeholder="Total jam"
@@ -33,7 +33,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamPembelajaran: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label>Administrasi</Label>
                   <Input
                     placeholder="Total jam"
@@ -41,7 +41,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamAdministrasi: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label>Adaptasi Teknologi</Label>
                   <Input
                     placeholder="Total jam"
@@ -53,7 +53,7 @@ export default function FooterForm() {
             )}
             {isAM && (
               <div className="grid gap-4 md:grid-cols-5">
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label className="text-xs">Menyusun Perangkat</Label>
                   <Input
                     placeholder="0"
@@ -61,7 +61,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamMenyusunPerangkat: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label className="text-xs">Melaksanakan Pembelajaran</Label>
                   <Input
                     placeholder="0"
@@ -69,7 +69,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamMelaksanakanPembelajaran: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label className="text-xs">Asesmen</Label>
                   <Input
                     placeholder="0"
@@ -77,7 +77,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamAsesmen: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label className="text-xs">Refleksi</Label>
                   <Input
                     placeholder="0"
@@ -85,7 +85,7 @@ export default function FooterForm() {
                     onChange={(e) => updateFooter({ jumlahJamRefleksi: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex h-full flex-col justify-end space-y-2">
                   <Label className="text-xs">Pengambilan Data</Label>
                   <Input
                     placeholder="0"

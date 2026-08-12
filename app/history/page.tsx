@@ -81,12 +81,19 @@ export default function HistoryPage() {
                 {logbooks.length} logbook tersimpan
               </p>
             </div>
-            <Link href="/">
-              <Button size="lg" className="bg-white text-black hover:bg-gray-100 text-lg neo-shadow-xl">
-                <Plus className="h-5 w-5 mr-2" strokeWidth={3} />
-                Buat Baru
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/">
+                <Button size="lg" className="bg-white text-black hover:bg-gray-100 text-lg neo-shadow-xl w-full sm:w-auto">
+                  Kembali ke Beranda
+                </Button>
+              </Link>
+              <Link href="/#templates">
+                <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-500 text-lg neo-shadow-xl w-full sm:w-auto">
+                  <Plus className="h-5 w-5 mr-2" strokeWidth={3} />
+                  Buat Baru
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
