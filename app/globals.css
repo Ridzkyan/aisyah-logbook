@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* Neobrutalism Design System */
+:root {
+  /* Colors */
+  --neo-blue: #3B82F6;
+  --neo-pink: #EC4899;
+  --neo-yellow: #FBBF24;
+  --neo-green: #10B981;
+  --neo-purple: #8B5CF6;
+  --neo-red: #EF4444;
+  --neo-black: #0A0A0A;
+  --neo-white: #FFFFFF;
+  --neo-bg: #F5F5F5;
+  
+  /* Shadows (offset) */
+  --shadow-sm: 2px 2px 0 var(--neo-black);
+  --shadow-md: 4px 4px 0 var(--neo-black);
+  --shadow-lg: 6px 6px 0 var(--neo-black);
+  --shadow-xl: 8px 8px 0 var(--neo-black);
+  
+  /* Borders */
+  --border-width: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--neo-bg);
+  color: var(--neo-black);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Neobrutalism Utility Classes */
+.neo-shadow-sm { box-shadow: var(--shadow-sm); }
+.neo-shadow { box-shadow: var(--shadow-md); }
+.neo-shadow-lg { box-shadow: var(--shadow-lg); }
+.neo-shadow-xl { box-shadow: var(--shadow-xl); }
+
+.neo-border { border: var(--border-width) solid var(--neo-black); }
+
+/* Hover lift effect */
+.neo-lift {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.neo-lift:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--neo-black);
+}
+
+.neo-lift:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--neo-black);
+}
+
+/* Button press effect */
+.neo-press:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--neo-black) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neo-blue);
+  border: 2px solid var(--neo-black);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neo-pink);
+}
+
+/* Selection */
+::selection {
+  background: var(--neo-yellow);
+  color: var(--neo-black);
+}
