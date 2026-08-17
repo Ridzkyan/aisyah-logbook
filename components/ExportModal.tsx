@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useLogbook } from '@/contexts/LogbookContext';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FileText, FileDown, Loader2, Heart } from 'lucide-react';
-import { exportToWordTemplate } from '@/lib/export/word-template';
+import { exportToWordFinal } from '@/lib/export/word-final';
 
 interface ExportModalProps {
   open: boolean;
@@ -52,7 +52,7 @@ export default function ExportModal({ open, onOpenChange }: ExportModalProps) {
 
     setIsExporting(true);
     try {
-      await exportToWordTemplate(logbook, filename);
+      await exportToWordFinal(logbook, filename);
       
       // Show success message
       setTimeout(() => {
@@ -165,3 +165,4 @@ export default function ExportModal({ open, onOpenChange }: ExportModalProps) {
     </Dialog>
   );
 }
+
