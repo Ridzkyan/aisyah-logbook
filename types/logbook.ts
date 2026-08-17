@@ -20,7 +20,7 @@ export interface KKNEntry {
   hariTanggal: string;
   programKerja: string;
   deskripsi: string;
-  foto: ImageInput | null;
+  fotos: ImageInput[];
   linkDokumen: string;
 }
 
@@ -34,7 +34,7 @@ export interface PLPEntry {
   kegiatanPembelajaran: string;
   kegiatanAdministrasi: string;
   kegiatanAdaptasiTeknologi: string;
-  foto: ImageInput | null;
+  fotos: ImageInput[];
   linkDokumen: string;
 }
 
@@ -48,7 +48,7 @@ export interface AMEntry {
   jamRefleksi: string;
   jamPengambilanData: string;
   deskripsiAktivitas: string;
-  foto: ImageInput | null;
+  fotos: ImageInput[];
   linkDokumen: string;
 }
 

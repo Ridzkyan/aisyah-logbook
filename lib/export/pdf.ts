@@ -3,10 +3,11 @@ import autoTable from 'jspdf-autotable';
 import { Logbook, KKNEntry, PLPEntry, AMEntry, ImageInput } from '@/types/logbook';
 
 // Helper to get image text for PDF export
-function getImageText(foto: ImageInput | null): string {
-  if (!foto) return '-';
+function getImageText(fotos: import('@/types/logbook').ImageInput[]): string {
+  if (!fotos || fotos.length === 0) return '-';
+  const foto = fotos[0];
   if (foto.type === 'url') return foto.url;
-  return '[Gambar]';
+  return fotos.length > 1 ? `[${fotos.length} Gambar]` : '[Gambar]';
 }
 
 export async function exportToPDF(logbook: Logbook, filename: string) {
@@ -75,7 +76,7 @@ function createKKNTable(doc: jsPDF, logbook: Logbook, startY: number) {
       entry.hariTanggal || '-',
       entry.programKerja || '-',
       entry.deskripsi || '-',
-      entry.foto?.type === 'upload' ? '' : getImageText(entry.foto),
+      entry.fotos?.[0]?.type === 'upload' ? '' : getImageText(entry.fotos),
       entry.linkDokumen || '-',
     ]),
     theme: 'grid',
@@ -93,7 +94,7 @@ function createKKNTable(doc: jsPDF, logbook: Logbook, startY: number) {
     didDrawCell: (data) => {
       // Index 4 is Foto
       if (data.section === 'body' && data.column.index === 4) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           try {
             // Draw image inside cell with padding
@@ -117,7 +118,7 @@ function createKKNTable(doc: jsPDF, logbook: Logbook, startY: number) {
     },
     didParseCell: (data) => {
       if (data.section === 'body' && data.column.index === 4) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           data.cell.styles.minCellHeight = 35; // 30mm image + 5mm padding
         }
@@ -153,7 +154,7 @@ function createPLPTable(doc: jsPDF, logbook: Logbook, startY: number) {
       entry.jamAdministrasi || '-',
       entry.jamAdaptasiTeknologi || '-',
       `Kegiatan Membantu Pembelajaran:\n${entry.kegiatanPembelajaran || '-'}\n\nKegiatan Membantu Administrasi:\n${entry.kegiatanAdministrasi || '-'}\n\nKegiatan Membantu Adaptasi Teknologi:\n${entry.kegiatanAdaptasiTeknologi || '-'}`,
-      entry.foto?.type === 'upload' ? '' : getImageText(entry.foto),
+      entry.fotos?.[0]?.type === 'upload' ? '' : getImageText(entry.fotos),
       entry.linkDokumen || '-',
     ]),
     theme: 'grid',
@@ -172,7 +173,7 @@ function createPLPTable(doc: jsPDF, logbook: Logbook, startY: number) {
     },
     didDrawCell: (data) => {
       if (data.section === 'body' && data.column.index === 6) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           try {
             const dim = 25;
@@ -184,7 +185,7 @@ function createPLPTable(doc: jsPDF, logbook: Logbook, startY: number) {
     },
     didParseCell: (data) => {
       if (data.section === 'body' && data.column.index === 6) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           data.cell.styles.minCellHeight = 30;
         }
@@ -224,7 +225,7 @@ function createAMTable(doc: jsPDF, logbook: Logbook, startY: number) {
       entry.jamRefleksi || '-',
       entry.jamPengambilanData || '-',
       entry.deskripsiAktivitas || '-',
-      entry.foto?.type === 'upload' ? '' : getImageText(entry.foto),
+      entry.fotos?.[0]?.type === 'upload' ? '' : getImageText(entry.fotos),
       entry.linkDokumen || '-',
     ]),
     theme: 'grid',
@@ -245,7 +246,7 @@ function createAMTable(doc: jsPDF, logbook: Logbook, startY: number) {
     },
     didDrawCell: (data) => {
       if (data.section === 'body' && data.column.index === 8) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           try {
             const dim = 25;
@@ -257,7 +258,7 @@ function createAMTable(doc: jsPDF, logbook: Logbook, startY: number) {
     },
     didParseCell: (data) => {
       if (data.section === 'body' && data.column.index === 8) {
-        const foto = entries[data.row.index]?.foto;
+        const foto = entries[data.row.index]?.fotos?.[0];
         if (foto && foto.type === 'upload') {
           data.cell.styles.minCellHeight = 30;
         }

@@ -3,10 +3,11 @@ import { saveAs } from 'file-saver';
 import { Logbook, KKNEntry, PLPEntry, AMEntry, ImageInput } from '@/types/logbook';
 
 // Helper to get image text for Word export
-function getImageText(foto: ImageInput | null): string {
-  if (!foto) return '-';
+function getImageText(fotos: import('@/types/logbook').ImageInput[]): string {
+  if (!fotos || fotos.length === 0) return '-';
+  const foto = fotos[0];
   if (foto.type === 'url') return foto.url;
-  return '[Gambar terupload]';
+  return fotos.length > 1 ? `[${fotos.length} Gambar terupload]` : '[Gambar terupload]';
 }
 
 export async function exportToWord(logbook: Logbook, filename: string) {
@@ -99,7 +100,7 @@ function createKKNTable(logbook: Logbook, borders: any): Table {
         new TableCell({ children: [new Paragraph({ text: entry.hariTanggal || '-' })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.programKerja || '-' })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.deskripsi || '-' })], borders }),
-        new TableCell({ children: [new Paragraph({ text: getImageText(entry.foto) })], borders }),
+        new TableCell({ children: [new Paragraph({ text: getImageText(entry.fotos) })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.linkDokumen || '-' })], borders }),
       ],
     })
@@ -141,7 +142,7 @@ function createPLPTable(logbook: Logbook, borders: any): Table {
         new TableCell({ children: [new Paragraph({ text: entry.jamAdministrasi || '-', alignment: AlignmentType.CENTER })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.jamAdaptasiTeknologi || '-', alignment: AlignmentType.CENTER })], borders }),
         new TableCell({ children: [new Paragraph({ text: deskripsi })], borders }),
-        new TableCell({ children: [new Paragraph({ text: getImageText(entry.foto) })], borders }),
+        new TableCell({ children: [new Paragraph({ text: getImageText(entry.fotos) })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.linkDokumen || '-' })], borders }),
       ],
     });
@@ -181,7 +182,7 @@ function createAMTable(logbook: Logbook, borders: any): Table {
         new TableCell({ children: [new Paragraph({ text: entry.jamRefleksi || '-', alignment: AlignmentType.CENTER })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.jamPengambilanData || '-', alignment: AlignmentType.CENTER })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.deskripsiAktivitas || '-' })], borders }),
-        new TableCell({ children: [new Paragraph({ text: getImageText(entry.foto) })], borders }),
+        new TableCell({ children: [new Paragraph({ text: getImageText(entry.fotos) })], borders }),
         new TableCell({ children: [new Paragraph({ text: entry.linkDokumen || '-' })], borders }),
       ],
     })

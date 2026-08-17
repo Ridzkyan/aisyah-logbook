@@ -144,7 +144,11 @@ function renderTableBody(templateType: string, entries: any[]) {
           <td className="border border-black p-2">{entry.programKerja || '-'}</td>
           <td className="border border-black p-2 whitespace-pre-wrap">{entry.deskripsi || '-'}</td>
           <td className="border border-black p-2 text-xs break-all">
-            {entry.foto ? (entry.foto.type === 'upload' ? '[Gambar]' : entry.foto.url) : '-'}
+            {entry.fotos && entry.fotos.length > 0
+              ? entry.fotos.length === 1
+                ? (entry.fotos[0].type === 'upload' ? '[Gambar]' : entry.fotos[0].url)
+                : `[${entry.fotos.length} Foto]`
+              : '-'}
           </td>
           <td className="border border-black p-2 text-xs break-all">{entry.linkDokumen || '-'}</td>
         </tr>
@@ -163,7 +167,11 @@ function renderTableBody(templateType: string, entries: any[]) {
             <p><strong>T:</strong> {entry.kegiatanAdaptasiTeknologi || '-'}</p>
           </td>
           <td className="border border-black p-2 text-xs break-all">
-            {entry.foto ? (entry.foto.type === 'upload' ? '[Gambar]' : entry.foto.url) : '-'}
+            {entry.fotos && entry.fotos.length > 0
+              ? entry.fotos.length === 1
+                ? (entry.fotos[0].type === 'upload' ? '[Gambar]' : entry.fotos[0].url)
+                : `[${entry.fotos.length} Foto]`
+              : '-'}
           </td>
           <td className="border border-black p-2 text-xs break-all">{entry.linkDokumen || '-'}</td>
         </tr>
@@ -180,7 +188,11 @@ function renderTableBody(templateType: string, entries: any[]) {
           <td className="border border-black p-2 text-center text-xs">{entry.jamPengambilanData || '-'}</td>
           <td className="border border-black p-2 text-xs whitespace-pre-wrap">{entry.deskripsiAktivitas || '-'}</td>
           <td className="border border-black p-2 text-xs break-all">
-            {entry.foto ? (entry.foto.type === 'upload' ? '[Gambar]' : entry.foto.url) : '-'}
+            {entry.fotos && entry.fotos.length > 0
+              ? entry.fotos.length === 1
+                ? (entry.fotos[0].type === 'upload' ? '[Gambar]' : entry.fotos[0].url)
+                : `[${entry.fotos.length} Foto]`
+              : '-'}
           </td>
           <td className="border border-black p-2 text-xs break-all">{entry.linkDokumen || '-'}</td>
         </tr>

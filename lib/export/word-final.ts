@@ -82,8 +82,8 @@ async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array
   }
 }
 
-// Create image cell content
-async function createImageParagraph(foto: ImageInput | null): Promise<Paragraph> {
+// Create image cell content for a single foto
+async function createImageParagraph(foto: ImageInput): Promise<Paragraph> {
   const imageData = await getImageData(foto);
 
   if (imageData) {
@@ -91,7 +91,7 @@ async function createImageParagraph(foto: ImageInput | null): Promise<Paragraph>
       return new Paragraph({
         children: [
           new ImageRun({
-            type: 'png', // or 'jpg', depends on image
+            type: 'png',
             data: imageData.data,
             transformation: {
               width: imageData.width,
@@ -106,13 +106,30 @@ async function createImageParagraph(foto: ImageInput | null): Promise<Paragraph>
     }
   }
 
-  // Fallback: empty or text
-  const text = foto ? (foto.type === 'url' ? 'Link: ' + foto.url : '') : '';
-  return new Paragraph({ 
-    text, 
+  // Fallback: text
+  const text = foto.type === 'url' ? 'Link: ' + foto.url : '';
+  return new Paragraph({
+    text,
     alignment: AlignmentType.CENTER,
     style: 'Normal',
   });
+}
+
+// Create array of paragraphs for multiple fotos (one per foto, stacked vertically)
+async function createImagesParagraphs(fotos: ImageInput[]): Promise<Paragraph[]> {
+  if (!fotos || fotos.length === 0) {
+    return [new Paragraph({ text: '', alignment: AlignmentType.CENTER, style: 'Normal' })];
+  }
+  const paragraphs: Paragraph[] = [];
+  for (let i = 0; i < fotos.length; i++) {
+    const para = await createImageParagraph(fotos[i]);
+    paragraphs.push(para);
+    // Add small spacing paragraph between images (except after last)
+    if (i < fotos.length - 1) {
+      paragraphs.push(new Paragraph({ text: '', spacing: { after: 60 } }));
+    }
+  }
+  return paragraphs;
 }
 
 /**
@@ -296,7 +313,7 @@ async function createKKNTableFinal(logbook: Logbook): Promise<Table> {
 
   // Data rows
   for (const entry of entries) {
-    const imageParagraph = await createImageParagraph(entry.foto);
+    const imageParagraphs = await createImagesParagraphs(entry.fotos);
     
     rows.push(new TableRow({
       children: [
@@ -325,7 +342,7 @@ async function createKKNTableFinal(logbook: Logbook): Promise<Table> {
           verticalAlign: VerticalAlign.TOP,
         }),
         new TableCell({
-          children: [imageParagraph],
+          children: imageParagraphs,
           borders,
           verticalAlign: VerticalAlign.CENTER,
         }),
@@ -467,7 +484,7 @@ async function createPLPTableFinal(logbook: Logbook): Promise<Table> {
 
   // Data rows
   for (const entry of entries) {
-    const imageParagraph = await createImageParagraph(entry.foto);
+    const imageParagraphs = await createImagesParagraphs(entry.fotos);
     
     // Build deskripsi with 3 parts
     const deskripsi = `Kegiatan Membantu Pembelajaran:\n${entry.kegiatanPembelajaran || ''}\n\nKegiatan Membantu Administrasi:\n${entry.kegiatanAdministrasi || ''}\n\nKegiatan Membantu Adaptasi Teknologi:\n${entry.kegiatanAdaptasiTeknologi || ''}`;
@@ -505,7 +522,7 @@ async function createPLPTableFinal(logbook: Logbook): Promise<Table> {
           verticalAlign: VerticalAlign.TOP,
         }),
         new TableCell({
-          children: [imageParagraph],
+          children: imageParagraphs,
           borders,
           verticalAlign: VerticalAlign.CENTER,
         }),
@@ -663,7 +680,7 @@ async function createAMTableFinal(logbook: Logbook): Promise<Table> {
 
   // Data rows
   for (const entry of entries) {
-    const imageParagraph = await createImageParagraph(entry.foto);
+    const imageParagraphs = await createImagesParagraphs(entry.fotos);
     
     rows.push(new TableRow({
       children: [
@@ -708,7 +725,7 @@ async function createAMTableFinal(logbook: Logbook): Promise<Table> {
           verticalAlign: VerticalAlign.TOP,
         }),
         new TableCell({
-          children: [imageParagraph],
+          children: imageParagraphs,
           borders,
           verticalAlign: VerticalAlign.CENTER,
         }),

@@ -134,8 +134,8 @@ export default function AMEntryCard({ entry, isFirst, isLast }: Props) {
           <div className="space-y-2">
             <Label>Foto Dokumentasi</Label>
             <ImageUploader
-              value={entry.foto}
-              onChange={(foto) => updateEntry(entry.id, { foto })}
+              value={entry.fotos}
+              onChange={(fotos) => updateEntry(entry.id, { fotos })}
             />
           </div>
           <div className="space-y-2">

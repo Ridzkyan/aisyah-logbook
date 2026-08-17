@@ -52,8 +52,9 @@ function base64DataURLToArrayBuffer(dataURL: string) {
   return bytes.buffer;
 }
 
-function getWordImageValue(foto: ImageInput | null | undefined): string {
-  if (!foto) return '';
+function getWordImageValue(fotos: ImageInput[]): string {
+  if (!fotos || fotos.length === 0) return '';
+  const foto = fotos[0];
   if (foto.type === 'upload') return foto.preview;
   if (foto.type === 'url') return foto.url;
   return '';
@@ -68,7 +69,7 @@ function prepareKKNData(logbook: Logbook) {
     hariTanggal: entry.hariTanggal || '',
     programKerja: entry.programKerja || '',
     deskripsi: entry.deskripsi || '',
-    foto: getWordImageValue(entry.foto),
+    foto: getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
   }));
 
@@ -93,7 +94,7 @@ function preparePLPData(logbook: Logbook) {
     kegiatanPembelajaran: entry.kegiatanPembelajaran || '',
     kegiatanAdministrasi: entry.kegiatanAdministrasi || '',
     kegiatanAdaptasiTeknologi: entry.kegiatanAdaptasiTeknologi || '',
-    foto: getWordImageValue(entry.foto),
+    foto: getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
   }));
 
@@ -124,7 +125,7 @@ function prepareAMData(logbook: Logbook) {
     jamRefleksi: entry.jamRefleksi || '',
     jamPengambilanData: entry.jamPengambilanData || '',
     deskripsiAktivitas: entry.deskripsiAktivitas || '',
-    foto: getWordImageValue(entry.foto),
+    foto: getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
   }));
 

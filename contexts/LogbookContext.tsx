@@ -35,7 +35,7 @@ function createEmptyEntry(templateType: TemplateType, no: number): KKNEntry | PL
     id: generateUUID(),
     no,
     hariTanggal: '',
-    foto: null,
+    fotos: [],
     linkDokumen: '',
   };
 
