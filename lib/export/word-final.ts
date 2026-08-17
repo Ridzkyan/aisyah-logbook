@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FINAL WORD EXPORT - 100% MATCH TEMPLATE
  * 
  * Strategi: Recreate template structure EXACTLY menggunakan docx library
@@ -47,7 +47,7 @@ const TABLE_BORDER = {
 };
 
 // Helper: Convert image to Uint8Array
-async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; width: number; height: number } | null> {
+async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; imageType: 'jpeg' | 'png' | 'gif' | 'bmp'; width: number; height: number } | null> {
   if (!foto) return null;
 
   try {
@@ -70,11 +70,18 @@ async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array
       imageBuffer = new Uint8Array(arrayBuffer);
     }
 
-    // Return with fixed size (matching template)
+    // Detect image type from base64/URL
+    let imageType: 'jpeg' | 'png' | 'gif' | 'bmp' = 'jpeg';
+    if (foto.type === 'upload') {
+      if (foto.preview.includes('image/png')) imageType = 'png';
+      else if (foto.preview.includes('image/gif')) imageType = 'gif';
+    }
+    // Return with size that fits within foto cell
     return {
       data: imageBuffer,
-      width: 120, // pixels
-      height: 120, // pixels
+      imageType,
+      width: 65,
+      height: 65,
     };
   } catch (error) {
     console.error('Failed to process image:', error);
@@ -91,7 +98,7 @@ async function createImageParagraph(foto: ImageInput): Promise<Paragraph> {
       return new Paragraph({
         children: [
           new ImageRun({
-            type: 'png',
+            type: imageData.imageType,
             data: imageData.data,
             transformation: {
               width: imageData.width,
@@ -1017,3 +1024,5 @@ async function createFooterFinal(logbook: Logbook): Promise<Paragraph[]> {
 
   return paragraphs;
 }
+
+
