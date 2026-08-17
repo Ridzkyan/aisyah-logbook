@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FileText, FileDown, Loader2, Heart } from 'lucide-react';
-import { exportToWordFinal } from '@/lib/export/word-final';
+import { exportToWordTemplate } from '@/lib/export/word-template';
 
 interface ExportModalProps {
   open: boolean;
@@ -52,7 +52,7 @@ export default function ExportModal({ open, onOpenChange }: ExportModalProps) {
 
     setIsExporting(true);
     try {
-      await exportToWordFinal(logbook, filename);
+      await exportToWordTemplate(logbook, filename);
       
       // Show success message
       setTimeout(() => {
@@ -165,4 +165,5 @@ export default function ExportModal({ open, onOpenChange }: ExportModalProps) {
     </Dialog>
   );
 }
+
 

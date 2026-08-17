@@ -1,28 +1,16 @@
-/**
- * WORD EXPORT USING DOCXTEMPLATER + ORIGINAL TEMPLATE FILES
- *
- * Strategy: Load the original faculty .docx template from /public/templates/,
- * inject user data via docxtemplater placeholders, then download.
- * This guarantees 100% formatting match with the original template.
- */
-
-import PizZip from 'pizzip';
+﻿import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
 // @ts-ignore
 import ImageModule from 'docxtemplater-image-module-free';
 import { saveAs } from 'file-saver';
 import { Logbook, KKNEntry, PLPEntry, AMEntry, ImageInput } from '@/types/logbook';
 
-// Template URLs (served from /public/templates/)
 const TEMPLATE_URLS: Record<string, string> = {
   KKN: '/templates/template-kkn.docx',
   PLP: '/templates/template-plp.docx',
   AM: '/templates/template-am.docx',
 };
 
-/**
- * Fetch a template file from the public directory and return as ArrayBuffer
- */
 async function fetchTemplate(templateType: string): Promise<ArrayBuffer> {
   const url = TEMPLATE_URLS[templateType];
   if (!url) throw new Error(`No template found for type: ${templateType}`);
@@ -34,14 +22,9 @@ async function fetchTemplate(templateType: string): Promise<ArrayBuffer> {
   return response.arrayBuffer();
 }
 
-/**
- * Convert base64 data URL to ArrayBuffer for docxtemplater-image-module
- */
 function base64DataURLToArrayBuffer(dataURL: string) {
   const base64Regex = /^data:image\/(png|jpg|jpeg|svg|svg\+xml|gif);base64,/;
-  if (!base64Regex.test(dataURL)) {
-    return null;
-  }
+  if (!base64Regex.test(dataURL)) return null;
   const stringBase64 = dataURL.replace(base64Regex, '');
   const binaryString = window.atob(stringBase64);
   const len = binaryString.length;
@@ -52,26 +35,75 @@ function base64DataURLToArrayBuffer(dataURL: string) {
   return bytes.buffer;
 }
 
-function getWordImageValue(fotos: ImageInput[]): string {
+// Stitch multiple images vertically on a canvas
+async function getWordImageValue(fotos: ImageInput[]): Promise<string> {
   if (!fotos || fotos.length === 0) return '';
-  const foto = fotos[0];
-  if (foto.type === 'upload') return foto.preview;
-  if (foto.type === 'url') return foto.url;
-  return '';
+  if (fotos.length === 1) {
+    return fotos[0].type === 'upload' ? fotos[0].preview : fotos[0].url;
+  }
+
+  return new Promise((resolve) => {
+    const imgElements: HTMLImageElement[] = [];
+    let loadedCount = 0;
+    
+    fotos.forEach((foto, index) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        imgElements[index] = img;
+        loadedCount++;
+        if (loadedCount === fotos.length) drawCanvas();
+      };
+      img.onerror = () => {
+        const dummy = new Image();
+        imgElements[index] = dummy;
+        loadedCount++;
+        if (loadedCount === fotos.length) drawCanvas();
+      };
+      img.src = foto.type === 'upload' ? foto.preview : foto.url;
+    });
+
+    function drawCanvas() {
+      const validImgs = imgElements.filter(img => img.width > 0);
+      if (validImgs.length === 0) {
+        resolve('');
+        return;
+      }
+      
+      const maxWidth = Math.max(...validImgs.map(i => i.width));
+      const gap = 40; // Spacing between images
+      const totalHeight = validImgs.reduce((sum, img) => sum + img.height, 0) + (gap * (validImgs.length - 1));
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = maxWidth;
+      canvas.height = totalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(''); return; }
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, maxWidth, totalHeight);
+      
+      let currentY = 0;
+      validImgs.forEach(img => {
+        const x = (maxWidth - img.width) / 2;
+        ctx.drawImage(img, x, currentY);
+        currentY += img.height + gap;
+      });
+      
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    }
+  });
 }
 
-/**
- * Prepare data for KKN template
- */
-function prepareKKNData(logbook: Logbook) {
-  const entries = (logbook.entries as KKNEntry[]).map((entry) => ({
+async function prepareKKNData(logbook: Logbook) {
+  const entries = await Promise.all((logbook.entries as KKNEntry[]).map(async (entry) => ({
     no: entry.no,
     hariTanggal: entry.hariTanggal || '',
     programKerja: entry.programKerja || '',
     deskripsi: entry.deskripsi || '',
-    foto: getWordImageValue(entry.fotos),
+    foto: await getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
-  }));
+  })));
 
   return {
     nama: logbook.header.nama || '',
@@ -81,11 +113,8 @@ function prepareKKNData(logbook: Logbook) {
   };
 }
 
-/**
- * Prepare data for PLP template
- */
-function preparePLPData(logbook: Logbook) {
-  const entries = (logbook.entries as PLPEntry[]).map((entry) => ({
+async function preparePLPData(logbook: Logbook) {
+  const entries = await Promise.all((logbook.entries as PLPEntry[]).map(async (entry) => ({
     no: entry.no,
     hariTanggal: entry.hariTanggal || '',
     jamPembelajaran: entry.jamPembelajaran || '',
@@ -94,9 +123,9 @@ function preparePLPData(logbook: Logbook) {
     kegiatanPembelajaran: entry.kegiatanPembelajaran || '',
     kegiatanAdministrasi: entry.kegiatanAdministrasi || '',
     kegiatanAdaptasiTeknologi: entry.kegiatanAdaptasiTeknologi || '',
-    foto: getWordImageValue(entry.fotos),
+    foto: await getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
-  }));
+  })));
 
   return {
     nama: logbook.header.nama || '',
@@ -112,11 +141,8 @@ function preparePLPData(logbook: Logbook) {
   };
 }
 
-/**
- * Prepare data for AM template
- */
-function prepareAMData(logbook: Logbook) {
-  const entries = (logbook.entries as AMEntry[]).map((entry) => ({
+async function prepareAMData(logbook: Logbook) {
+  const entries = await Promise.all((logbook.entries as AMEntry[]).map(async (entry) => ({
     no: entry.no,
     hariTanggal: entry.hariTanggal || '',
     jamMenyusunPerangkat: entry.jamMenyusunPerangkat || '',
@@ -125,9 +151,9 @@ function prepareAMData(logbook: Logbook) {
     jamRefleksi: entry.jamRefleksi || '',
     jamPengambilanData: entry.jamPengambilanData || '',
     deskripsiAktivitas: entry.deskripsiAktivitas || '',
-    foto: getWordImageValue(entry.fotos),
+    foto: await getWordImageValue(entry.fotos),
     linkDokumen: entry.linkDokumen || '',
-  }));
+  })));
 
   return {
     nama: logbook.header.nama || '',
@@ -145,38 +171,28 @@ function prepareAMData(logbook: Logbook) {
   };
 }
 
-/**
- * MAIN EXPORT FUNCTION
- * Uses original faculty template + docxtemplater injection
- */
 export async function exportToWordTemplate(logbook: Logbook, filename: string): Promise<boolean> {
   try {
-    // 1. Fetch the template file
     const templateBuffer = await fetchTemplate(logbook.templateType);
-    
-    // 2. Load into PizZip
     const zip = new PizZip(templateBuffer);
-    
-    // 3. Setup Image Module
     const imageDimensionsCache: Record<string, { w: number; h: number }> = {};
 
     const imageOptions = {
       centered: false,
       getImage: function (tagValue: string) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           if (!tagValue) return resolve('');
           
           const resolveBuffer = () => {
             if (tagValue.startsWith('data:image')) {
               const buffer = base64DataURLToArrayBuffer(tagValue);
               if (buffer) return resolve(buffer);
-              return resolve(tagValue); // fallback
+              return resolve(tagValue);
             }
-            // If it's a URL, try to fetch it
             fetch(tagValue)
               .then((res) => res.arrayBuffer())
               .then((buffer) => resolve(buffer))
-              .catch(() => resolve(tagValue)); // fallback
+              .catch(() => resolve(tagValue));
           };
 
           const img = new Image();
@@ -184,68 +200,56 @@ export async function exportToWordTemplate(logbook: Logbook, filename: string): 
             imageDimensionsCache[tagValue] = { w: img.width, h: img.height };
             resolveBuffer();
           };
-          img.onerror = () => {
-            resolveBuffer();
-          };
+          img.onerror = () => resolveBuffer();
           img.src = tagValue;
         });
       },
       getSize: function (img: any, tagValue: string) {
         const dim = imageDimensionsCache[tagValue];
         if (dim) {
-          // Ukuran maksimum area (sekitar 4cm)
           const maxW = 150;
-          const maxH = 150;
-          
-          // Menghitung rasio agar gambar tidak gepeng (menjaga aspek rasio)
-          const ratio = Math.min(maxW / dim.w, maxH / dim.h);
+          // IMPORTANT FIX: Keep the ratio purely by width so it can be as tall as needed!
+          const ratio = maxW / dim.w;
           return [dim.w * ratio, dim.h * ratio];
         }
-        return [150, 150]; // Fallback
+        return [150, 150];
       },
     };
     const imageModule = new ImageModule(imageOptions);
 
-    // 4. Initialize Docxtemplater
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
       linebreaks: true,
       modules: [imageModule],
     });
 
-    // 5. Prepare data based on template type
     let data: Record<string, unknown>;
     switch (logbook.templateType) {
       case 'KKN':
-        data = prepareKKNData(logbook);
+        data = await prepareKKNData(logbook);
         break;
       case 'PLP':
-        data = preparePLPData(logbook);
+        data = await preparePLPData(logbook);
         break;
       case 'AM':
-        data = prepareAMData(logbook);
+        data = await prepareAMData(logbook);
         break;
       default:
         throw new Error('Unknown template type');
     }
 
-    // 5. Render (inject data)
     await doc.renderAsync(data);
 
-    // 6. Generate output blob
     const outputBlob = doc.getZip().generate({
       type: 'blob',
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
 
-    // 7. Download
     saveAs(outputBlob, `${filename}.docx`);
     return true;
 
   } catch (error) {
     console.error('Export to Word (template) failed:', error);
-    
-    // Provide helpful error message
     if (error instanceof Error) {
       if (error.message.includes('Failed to load template')) {
         throw new Error('Template file tidak ditemukan. Pastikan file template ada di folder public/templates/');
