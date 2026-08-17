@@ -110,7 +110,7 @@ async function createImageParagraph(foto: ImageInput): Promise<Paragraph> {
       return new Paragraph({
         children: [
           new ImageRun({
-            type: imageData.imageType,
+            type: imageData.imageType as 'jpg' | 'png' | 'gif' | 'bmp',
             data: imageData.data,
             transformation: {
               width: imageData.width,
