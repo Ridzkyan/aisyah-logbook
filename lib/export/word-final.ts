@@ -47,7 +47,7 @@ const TABLE_BORDER = {
 };
 
 // Helper: Convert image to Uint8Array
-async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; imageType: 'jpeg' | 'png' | 'gif' | 'bmp'; width: number; height: number } | null> {
+async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; imageType: 'jpg' | 'png' | 'gif' | 'bmp'; width: number; height: number } | null> {
   if (!foto) return null;
 
   try {
@@ -71,7 +71,7 @@ async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array
     }
 
     // Detect image type from base64/URL
-    let imageType: 'jpeg' | 'png' | 'gif' | 'bmp' = 'jpeg';
+    let imageType: 'jpg' | 'png' | 'gif' | 'bmp' = 'jpg';
     if (foto.type === 'upload') {
       if (foto.preview.includes('image/png')) imageType = 'png';
       else if (foto.preview.includes('image/gif')) imageType = 'gif';
