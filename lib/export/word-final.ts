@@ -47,7 +47,7 @@ const TABLE_BORDER = {
 };
 
 // Helper: Convert image to Uint8Array
-async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; imageType: 'jpg' | 'png' | 'gif' | 'bmp'; width: number; height: number } | null> {
+async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array; imageType: 'jpg' | 'png' | 'gif' | 'bmp' | 'svg'; width: number; height: number } | null> {
   if (!foto) return null;
 
   try {
@@ -70,11 +70,23 @@ async function getImageData(foto: ImageInput | null): Promise<{ data: Uint8Array
       imageBuffer = new Uint8Array(arrayBuffer);
     }
 
-    // Detect image type from base64/URL
-    let imageType: 'jpg' | 'png' | 'gif' | 'bmp' = 'jpg';
+    // Detect image type — support all common formats
+    let imageType: 'jpg' | 'png' | 'gif' | 'bmp' | 'svg' = 'jpg';
     if (foto.type === 'upload') {
-      if (foto.preview.includes('image/png')) imageType = 'png';
-      else if (foto.preview.includes('image/gif')) imageType = 'gif';
+      const header = foto.preview.toLowerCase();
+      if (header.includes('image/png')) imageType = 'png';
+      else if (header.includes('image/gif')) imageType = 'gif';
+      else if (header.includes('image/bmp')) imageType = 'bmp';
+      else if (header.includes('image/svg')) imageType = 'svg';
+      // image/jpeg, image/jpg, image/webp etc. -> fallback to 'jpg'
+    } else {
+      // URL-type: detect from extension
+      const urlLower = foto.url.toLowerCase();
+      if (urlLower.includes('.png')) imageType = 'png';
+      else if (urlLower.includes('.gif')) imageType = 'gif';
+      else if (urlLower.includes('.bmp')) imageType = 'bmp';
+      else if (urlLower.includes('.svg')) imageType = 'svg';
+      // .jpg, .jpeg, or unknown -> 'jpg'
     }
     // Return with size that fits within foto cell
     return {
